@@ -5,6 +5,7 @@ pipeline {
         JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
         NODEJS_VERSION = '14' // Adjust the Node.js version as needed
     }
+    
     stages {
         stage('Install Node.js') {
             steps {
@@ -14,9 +15,7 @@ pipeline {
                 }
             }
         }
-    }
-    
-    stages {
+
         stage('Checkout') {
             steps {
                 script {
