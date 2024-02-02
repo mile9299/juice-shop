@@ -3,7 +3,6 @@ pipeline {
     
     environment {
         JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
-        // SNYK_TOKEN = credentials('SNYK') // Assumes you have a Jenkins credential named 'snyk-token' with your Snyk token
         NODEJS_VERSION = '14' // Adjust the Node.js version as needed
     }
     stages {
