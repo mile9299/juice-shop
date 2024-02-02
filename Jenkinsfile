@@ -34,7 +34,7 @@ pipeline {
                 script {
                     // Assuming your build process, for example, using npm
                     sh 'npm install'
-                    sh 'npm run build'
+                    sh 'npm start'
                 }
             }
         }
