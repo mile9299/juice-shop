@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
-        NODEJS_VERSION = '21.6.1' // Adjust the Node.js version as needed
+        NODEJS_VERSION = '14' // Adjust the Node.js version as needed
     }
     
     stages {
@@ -11,7 +11,8 @@ pipeline {
             steps {
                 script {
                     // Install Node.js
-                    tool name: "NodeJS ${NODEJS_VERSION}", type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+                    def nodejsTool = tool name: "NodeJS ${NODEJS_VERSION}", type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+                    env.PATH = "${nodejsTool}/bin:${env.PATH}"
                 }
             }
         }
@@ -36,10 +37,11 @@ pipeline {
         }
 
         stage('Test with Snyk') {
-            steps {
-                snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
-             }  
+            steps steps {
+        snykSecurity failOnError: false, snykInstallation: 'snyk@latest', snykTokenId: 'SNYK'
+            }
         }
+    }
 
         stage('Deploy') {
             steps {
