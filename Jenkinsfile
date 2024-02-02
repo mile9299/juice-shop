@@ -5,7 +5,8 @@ pipeline {
         JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
         NODEJS_VERSION = '21.6.1' // Adjust the Node.js version as needed
     }
-     stages {
+    
+    stages {
         stage('Install Node.js') {
             steps {
                 script {
@@ -13,12 +14,11 @@ pipeline {
                     if (nodejsTool) {
                         env.PATH = "${nodejsTool}/bin:${env.PATH}"
                     } else {
-                error "NodeJS ${NODEJS_VERSION} not found. Please configure it in Jenkins Global Tool Configuration."
+                        error "NodeJS ${NODEJS_VERSION} not found. Please configure it in Jenkins Global Tool Configuration."
+                    }
+                }
             }
         }
-    }
-}
-
 
         stage('Checkout') {
             steps {
@@ -41,10 +41,12 @@ pipeline {
 
         stage('Test with Snyk') {
             steps {
-                snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
-             }    
+                script {
+                    snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
+                }
             }
         }
+
         stage('Deploy') {
             steps {
                 script {
