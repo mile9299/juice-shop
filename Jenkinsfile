@@ -33,6 +33,7 @@ pipeline {
             steps {
                 script {
                     // Assuming your build process, for example, using npm
+                    sh 'npm audit fix'
                     sh 'npm install'
                     sh 'npm start'
                 }
