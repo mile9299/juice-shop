@@ -37,11 +37,12 @@ pipeline {
         }
 
         stage('Test with Snyk') {
-            steps steps {
-        snykSecurity failOnError: false, snykInstallation: 'snyk@latest', snykTokenId: 'SNYK'
+            steps {
+                script {
+                    snykSecurity failOnError: false, snykInstallation: 'snyk@latest', snykTokenId: 'SNYK'
+                }
             }
         }
-    }
 
         stage('Deploy') {
             steps {
