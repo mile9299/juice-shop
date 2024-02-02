@@ -33,6 +33,7 @@ pipeline {
             steps {
                 script {
                     // Assuming your build process, for example, using npm
+                    sh 'npm cache clean -f'
                     sh 'npm install'
                     sh 'npm start'
                 }
