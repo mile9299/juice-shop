@@ -9,7 +9,7 @@ pipeline {
         stage('Install Node.js') {
             steps {
                 script {
-                    def nodejsTool = tool name: "NodeJS ${NODEJS_VERSION}", type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+                    def nodejsTool = tool name: "NodeJS", type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
                     if (nodejsTool) {
                         env.PATH = "${nodejsTool}/bin:${env.PATH}"
                     } else {
