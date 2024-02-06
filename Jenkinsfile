@@ -2,44 +2,22 @@ pipeline {
     agent any
     
     environment {
-        JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
-        NODEJS_VERSION = '21.6.1' // Adjust the Node.js version as needed
+        JUICE_SHOP_REPO = 'https://github.com/mile9299/juice-shop.git'
+        DOCKER_PORT = 3000 // Default Docker port
     }
-    // added 
+    
+    tools {
+        nodejs 'NodeJS'
+    }
+// Added
     stages {
-        stage('Install Node.js') {
-            steps {
-                script {
-                    def nodejsTool = tool name: "NodeJS", type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
-                    if (nodejsTool) {
-                        env.PATH = "${nodejsTool}/bin:${env.PATH}"
-                    } else {
-                        error "NodeJS ${NODEJS_VERSION} not found. Please configure it in Jenkins Global Tool Configuration."
-                    }
-                }
-            }
-        }
-
         stage('Checkout') {
             steps {
                 script {
-                    // Checkout the Juice Shop repository
                     checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
                 }
             }
         }
-
-        stage('Build') {
-            steps {
-                script {
-                    // Assuming your build process, for example, using npm
-                    sh 'npm cache clean -f'
-                    sh 'npm install'
-                    sh 'npm start'
-                }
-            }
-        }
-
         stage('Test with Snyk') {
             steps {
                 script {
@@ -47,13 +25,32 @@ pipeline {
                 }
             }
         }
+        stage('Build') {
+            steps {
+                script {
+                    sh 'npm cache clean -f'
+                    sh 'npm install'
+                    // Start the application in the background using nohup
+                    sh 'nohup npm start > /dev/null 2>&1 &'
 
+                    // Sleep for a few seconds to ensure the application has started before moving to the next stage
+                    sleep(time: 5, unit: 'SECONDS')
+                }
+            }
+        }
         stage('Deploy') {
             steps {
                 script {
-                    // Assuming your deployment process, for example, using Docker
-                    sh 'docker build -t juice-shop .'
-                    sh 'docker run -p 3000:3000 -d juice-shop'
+                    // Stop and remove the container if it exists
+                    sh 'docker stop juice-shop || true'
+                    sh 'docker rm juice-shop || true'
+
+                    // Build and run the Docker container with a dynamically allocated port
+                    sh "docker build -t juice-shop ."
+                    sh "DOCKER_PORT=\$(docker run -d -P --name juice-shop juice-shop)"
+                    sh "DOCKER_HOST_PORT=\$(docker port $DOCKER_PORT 3000 | cut -d ':' -f 2)"
+
+                    echo "Juice Shop is running on http://localhost:\$DOCKER_HOST_PORT"
                 }
             }
         }
