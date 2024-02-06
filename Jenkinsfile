@@ -3,43 +3,29 @@ pipeline {
     
     environment {
         JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
-        NODEJS_VERSION = '21.6.1' // Adjust the Node.js version as needed
+        DOCKER_PORT = 3000 // Default Docker port
     }
-    // added 
+    
+    tools {
+        nodejs 'NodeJS'
+    }
+// Added
     stages {
-        stage('Install Node.js') {
-            steps {
-                script {
-                    def nodejsTool = tool name: "NodeJS", type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
-                    if (nodejsTool) {
-                        env.PATH = "${nodejsTool}/bin:${env.PATH}"
-                    } else {
-                        error "NodeJS ${NODEJS_VERSION} not found. Please configure it in Jenkins Global Tool Configuration."
-                    }
-                }
-            }
-        }
-
         stage('Checkout') {
             steps {
                 script {
-                    // Checkout the Juice Shop repository
                     checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
                 }
             }
         }
-         stage('Test with Snyk') {
+        stage('Test with Snyk') {
             steps {
                 script {
                     snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
                 }
             }
-        }    
-        soyment failed!'
         }
-    }
-}
-tage('Build') {
+        stage('Build') {
             steps {
                 script {
                     sh 'npm cache clean -f'
