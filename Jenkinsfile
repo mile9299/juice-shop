@@ -1,20 +1,22 @@
 pipeline {
     agent any
-    
+
     environment {
         JUICE_SHOP_REPO = 'https://github.com/mile9299/juice-shop.git'
         DOCKER_PORT = 3000 // Default Docker port
     }
-    
+
     tools {
         nodejs 'NodeJS'
     }
 
     stages {
-        stage('Preparation') {
+        stage('Update Node.js and npm') {
             steps {
                 script {
-                    sh 'npm install -g npm'
+                    sh 'nvm install 20.0.0' // Update the Node.js version to match your requirement
+                    sh 'nvm use 20.0.0'
+                    sh 'npm install -g npm@latest'
                 }
             }
         }
