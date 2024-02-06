@@ -6,30 +6,36 @@ pipeline {
         DOCKER_PORT = 3000 // Default Docker port
     }
 
-    tools {
-        nodejs 'NodeJS'
-    }
-
     stages {
-        stage('Load nvm') {
-            steps {
-                script {
-                    // Specify the path to nvm.sh in your Jenkins environment
-                    def nvmSh = "${tool 'NodeJS'}/lib/node_modules/nvm.sh"
-                    load "${nvmSh}"
-                }
-            }
-        }
-
         stage('Declarative: Checkout SCM') {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
             }
         }
 
+        stage('Install Node.js and npm') {
+            steps {
+                script {
+                    // Install Node.js and npm
+                    withEnv(['NVM_DIR=$HOME/.nvm', 'NODE_VERSION=20.0.0']) {
+                        sh '''
+                            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+                            export NVM_DIR="$HOME/.nvm"
+                            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+                            nvm install $NODE_VERSION
+                            nvm use $NODE_VERSION
+                            npm install -g npm
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Test with Snyk') {
             steps {
                 script {
+                    // Assuming you have configured Snyk in Jenkins with an API token named 'SNYK'
                     snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
                 }
             }
