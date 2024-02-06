@@ -28,7 +28,13 @@ pipeline {
                 }
             }
         }
-
+         stage('Test with Snyk') {
+            steps {
+                script {
+                    snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
+                }
+            }
+        }    
         stage('Build') {
             steps {
                 script {
@@ -36,14 +42,6 @@ pipeline {
                     sh 'npm cache clean -f'
                     sh 'npm install'
                     sh 'npm start'
-                }
-            }
-        }
-
-        stage('Test with Snyk') {
-            steps {
-                script {
-                    snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
                 }
             }
         }
