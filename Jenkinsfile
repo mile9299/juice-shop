@@ -46,12 +46,19 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+       stage('Deploy') {
             steps {
                 script {
-                    // Assuming your deployment process, for example, using Docker
-                    sh 'docker build -t juice-shop .'
-                    sh 'docker run -p 3000:3000 -d juice-shop'
+                    // Stop and remove the container if it exists
+                    sh 'docker stop juice-shop || true'
+                    sh 'docker rm juice-shop || true'
+
+                    // Build and run the Docker container with a dynamically allocated port
+                    sh "docker build -t juice-shop ."
+                    sh "DOCKER_PORT=\$(docker run -d -P --name juice-shop juice-shop)"
+                    sh "DOCKER_HOST_PORT=\$(docker port $DOCKER_PORT 3000 | cut -d ':' -f 2)"
+
+                    echo "Juice Shop is running on http://localhost:\$DOCKER_HOST_PORT"
                 }
             }
         }
