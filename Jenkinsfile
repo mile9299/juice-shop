@@ -35,18 +35,24 @@ pipeline {
                 }
             }
         }    
-        stage('Build') {
+        soyment failed!'
+        }
+    }
+}
+tage('Build') {
             steps {
                 script {
-                    // Assuming your build process, for example, using npm
                     sh 'npm cache clean -f'
                     sh 'npm install'
-                    sh 'npm start'
+                    // Start the application in the background using nohup
+                    sh 'nohup npm start > /dev/null 2>&1 &'
+
+                    // Sleep for a few seconds to ensure the application has started before moving to the next stage
+                    sleep(time: 5, unit: 'SECONDS')
                 }
             }
         }
-
-       stage('Deploy') {
+        stage('Deploy') {
             steps {
                 script {
                     // Stop and remove the container if it exists
