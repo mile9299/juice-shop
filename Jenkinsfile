@@ -11,21 +11,19 @@ pipeline {
     }
 
     stages {
-        stage('Update Node.js and npm') {
+        stage('Load nvm') {
             steps {
                 script {
-                    sh 'nvm install 20.0.0' // Update the Node.js version to match your requirement
-                    sh 'nvm use 20.0.0'
-                    sh 'npm install -g npm@latest'
+                    // Specify the path to nvm.sh in your Jenkins environment
+                    def nvmSh = "${tool 'NodeJS'}/lib/node_modules/nvm.sh"
+                    load "${nvmSh}"
                 }
             }
         }
 
-        stage('Checkout') {
+        stage('Declarative: Checkout SCM') {
             steps {
-                script {
-                    checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
-                }
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
             }
         }
 
@@ -41,7 +39,7 @@ pipeline {
             steps {
                 script {
                     sh 'npm cache clean -f'
-                    sh 'npm install --force'
+                    sh 'npm install'
                     // Start the application in the background using nohup
                     sh 'nohup npm start > /dev/null 2>&1 &'
 
