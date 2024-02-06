@@ -9,8 +9,16 @@ pipeline {
     tools {
         nodejs 'NodeJS'
     }
-// Added
+
     stages {
+        stage('Preparation') {
+            steps {
+                script {
+                    sh 'npm install -g npm'
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 script {
@@ -18,6 +26,7 @@ pipeline {
                 }
             }
         }
+
         stage('Test with Snyk') {
             steps {
                 script {
@@ -25,11 +34,12 @@ pipeline {
                 }
             }
         }
+
         stage('Build') {
             steps {
                 script {
                     sh 'npm cache clean -f'
-                    sh 'npm install'
+                    sh 'npm install --force'
                     // Start the application in the background using nohup
                     sh 'nohup npm start > /dev/null 2>&1 &'
 
@@ -38,6 +48,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy') {
             steps {
                 script {
