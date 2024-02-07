@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     sh 'npm cache clean -f'
-                    sh 'npm install'
+                    sh 'npm install --force'
                     // Start the application in the background using nohup
                     sh 'nohup npm start > /dev/null 2>&1 &'
 
