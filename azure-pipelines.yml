@@ -1,0 +1,69 @@
+trigger:
+- master
+
+pr:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  JUICE_SHOP_REPO: 'https://github.com/bkimminich/juice-shop.git'
+  DOCKER_PORT: 3000
+
+jobs:
+- job: Test_with_Snyk
+  steps:
+  - checkout: self
+
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '3.1.x'
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+      installationName: 'DotNetCoreSDK'
+
+  - script: |
+      npm install -g snyk
+      snyk auth f4835c65-42f8-40c8-a803-98d2f51b7eba
+      snyk test --severity-threshold=low
+    displayName: 'Test with Snyk'
+    
+- job: Build
+  steps:
+  - checkout: self
+
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '10.x'
+    displayName: 'Install Node.js'
+
+  - script: |
+      npm cache clean -f
+      npm install
+      npm start &
+      sleep 5
+    displayName: 'Build and Start Application'
+
+- job: Deploy
+  steps:
+  - checkout: self
+
+  - script: |
+      docker stop juice-shop || true
+      docker rm juice-shop || true
+      docker build -t juice-shop .
+      export DOCKER_PORT=$(docker run -d -P --name juice-shop juice-shop)
+      export DOCKER_HOST_PORT=$(docker port $DOCKER_PORT 3000 | cut -d ':' -f 2)
+      echo "Juice Shop is running on http://localhost:$DOCKER_HOST_PORT"
+    displayName: 'Deploy to Docker'
+
+- job: Post
+  steps:
+  - script: |
+      echo 'Build, test, and deployment successful!'
+    displayName: 'Post-Success'
+
+  - script: |
+      echo 'Build, test, or deployment failed!'
+    displayName: 'Post-Failure'
