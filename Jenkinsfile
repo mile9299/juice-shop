@@ -5,7 +5,7 @@ pipeline {
         JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
         DOCKER_PORT = 3000 // Default Docker port
     }
-    // Added comment
+    // Added
     tools {
         nodejs 'NodeJS'
     }
