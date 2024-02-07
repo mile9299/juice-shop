@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
+        JUICE_SHOP_REPO = 'https://github.com/mile9299/juice-shop.git'
         DOCKER_PORT = 3000 // Default Docker port
     }
     // Added
