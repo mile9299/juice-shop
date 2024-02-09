@@ -38,7 +38,11 @@ jobs:
     inputs:
       versionSpec: '10.x'
     displayName: 'Install Node.js'
-
+  - script: |
+      npm install -g snyk
+      snyk auth f4835c65-42f8-40c8-a803-98d2f51b7eba
+      snyk test --severity-threshold='critical'
+    displayName: 'Test with Snyk'
 - job: Deploy
   steps:
   - checkout: self
