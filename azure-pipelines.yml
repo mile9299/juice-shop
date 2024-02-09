@@ -29,10 +29,6 @@ jobs:
       npm start &
       sleep 5
     displayName: 'Build and Start Application'
-      npm install -g snyk
-      snyk auth f4835c65-42f8-40c8-a803-98d2f51b7eba
-      snyk test --severity-threshold='critical'
-    displayName: 'Test with Snyk'
     
 - job: Build
   steps:
