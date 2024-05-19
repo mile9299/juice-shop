@@ -23,6 +23,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    apt-get install -y procps
                     sh 'npm cache clean -f'
                     sh 'npm install --force'
                     // Start the application in the background using nohup
