@@ -23,7 +23,6 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'procps install --force'
                     sh 'npm cache clean -f'
                     sh 'npm install --force'
                     // Start the application ish 'npm install --force'n the background using nohup
