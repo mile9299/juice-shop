@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:latest'
+            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
         JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
