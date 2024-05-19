@@ -7,10 +7,6 @@ pipeline {
         SPECTRAL_DSN = credentials('SPECTRAL_DSN')
     }
 
-    tools {
-        nodejs 'NodeJS' // Make sure 'NodeJS' is the name of the Node.js installation configured in Jenkins
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -19,11 +15,12 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Build') {
             steps {
                 script {
-                    withEnv(["PATH+NODE=${tool name: 'NodeJS'}/bin"]) {
+                    // Using Node.js image to ensure Node.js and npm are available
+                    docker.image('node:14').inside {
                         sh 'npm cache clean -f'
                         sh 'npm install --force'
                         // Start the application in the background using nohup
@@ -35,7 +32,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Test with Snyk') {
             steps {
                 script {
@@ -43,19 +40,19 @@ pipeline {
                 }
             }
         }
-        
+
         stage('install Spectral') {
             steps {
                 sh "curl -L 'https://get.spectralops.io/latest/x/sh?dsn=$SPECTRAL_DSN' | sh"
             }
         }
-        
+
         stage('scan for issues') {
             steps {
                 sh "$HOME/.spectral/spectral scan --ok --engines secrets,iac,oss --include-tags base,audit,iac"
             }
         }
-        
+
         stage('Deploy') {
             steps {
                 script {
