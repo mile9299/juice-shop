@@ -27,7 +27,7 @@ pipeline {
                     // Using Node.js image to ensure Node.js and npm are available
 
                     // Ensure correct ownership of the .npm folder
-                    sh 'chown -R $(whoami) /var/lib/jenkins/.npm || true'
+                    sh 'chown -R jenkins:jenkins /usr/share/nodejs/npm/bin/npm || true'
                     docker.image('node:14').inside {
                         sh 'npm cache clean -f'
                         sh 'npm install --force'
