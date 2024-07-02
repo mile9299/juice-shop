@@ -24,14 +24,14 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                   docker.image('node:14').inside {
-                        sh '/usr/share/nodejs/npm/bin/npm cache clean -f'
-                        sh '/usr/share/nodejs/npm/bin/npm install --force'
+                 //  docker.image('node:14').inside {
+                   //     sh '/usr/share/nodejs/npm/bin/npm cache clean -f'
+                     //   sh '/usr/share/nodejs/npm/bin/npm install --force'
                         // Start the application in the background using nohup
-                        sh '/usr/share/nodejs/npm/bin/npm start > /dev/null 2>&1 &'
+                       // sh '/usr/share/nodejs/npm/bin/npm start > /dev/null 2>&1 &'
 
                         // Sleep for a few seconds to ensure the application has started before moving to the next stage
-                        sleep(time: 5, unit: 'SECONDS')
+                        // sleep(time: 5, unit: 'SECONDS')
                     }
                 }
             }
