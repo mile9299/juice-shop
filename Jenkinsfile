@@ -25,6 +25,9 @@ pipeline {
             steps {
                 script {
                     // Using Node.js image to ensure Node.js and npm are available
+
+                    // Ensure correct ownership of the .npm folder
+                    sh 'sudo chown -R jenkins:jenkins /var/lib/jenkins/.npm'                    
                     docker.image('node:14').inside {
                         sh 'npm cache clean -f'
                         sh 'npm install --force'
