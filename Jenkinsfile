@@ -24,15 +24,11 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // Using Node.js image to ensure Node.js and npm are available
-
-                    // Ensure correct ownership of the .npm folder
-                    sh 'chown -R 114:123 /usr/share/nodejs/npm/bin/npm || true'
-                    docker.image('node:14').inside {
-                        sh 'npm cache clean -f'
-                        sh 'npm install --force'
+                   docker.image('node:14').inside {
+                        sh '/usr/share/nodejs/npm/bin/npm cache clean -f'
+                        sh '/usr/share/nodejs/npm/bin/npm install --force'
                         // Start the application in the background using nohup
-                        sh 'nohup npm start > /dev/null 2>&1 &'
+                        sh 'nohup /usr/share/nodejs/npm/bin/npm start > /dev/null 2>&1 &'
 
                         // Sleep for a few seconds to ensure the application has started before moving to the next stage
                         sleep(time: 5, unit: 'SECONDS')
