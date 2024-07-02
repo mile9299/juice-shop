@@ -21,7 +21,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        //stage('Build') {
             //steps {
                // script {
                  //  docker.image('node:14').inside {
@@ -35,7 +35,7 @@ pipeline {
                    // }
               //  }
             //}
-        }
+      //  }
 
         stage('Test with Snyk') {
             steps {
