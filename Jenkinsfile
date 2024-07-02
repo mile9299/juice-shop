@@ -32,7 +32,7 @@ pipeline {
 
                         // Sleep for a few seconds to ensure the application has started before moving to the next stage
                         // sleep(time: 5, unit: 'SECONDS')
-                    }
+                   // }
                 }
             }
         }
