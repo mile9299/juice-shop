@@ -17,7 +17,7 @@ pipeline {
                 script {
                     def nodeVersion = sh(script: "node -v", returnStdout: true).trim()
                     echo "Current Node.js version: ${nodeVersion}"
-                    if (!nodeVersion.contains('v18.0.0')) {
+                    if (!nodeVersion.contains('20.0.0')) {
                         error "Incorrect Node.js version: ${nodeVersion}. Expected: v18.0.0"
                     }
                 }
