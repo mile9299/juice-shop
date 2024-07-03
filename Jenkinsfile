@@ -3,6 +3,8 @@ pipeline {
         docker {
             image 'docker:latest'
             args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+        }
+         docker {  
             image 'node:14'
             args '-u root:root'
         }
