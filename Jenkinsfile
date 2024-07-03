@@ -1,20 +1,17 @@
 pipeline {
     agent any
     
-
     environment {
         JUICE_SHOP_REPO = 'https://github.com/mile9299/juice-shop.git'
         DOCKER_PORT = 3000 // Default Docker port
     }
     
-
     tools {
         nodejs 'NodeJS'
     }
 
     stages {
         stage('Preparation') {
-        stage('Update Node.js and npm') {
             steps {
                 script {
                     sh 'npm install -g npm'
@@ -24,6 +21,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Checkout') {
             steps {
                 script {
@@ -31,6 +29,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Test with Snyk') {
             steps {
                 script {
@@ -38,6 +37,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Build') {
             steps {
                 script {
@@ -50,6 +50,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Deploy') {
             steps {
                 script {
@@ -65,13 +66,13 @@ pipeline {
             }
         }
     }
+    
     post {
         success {
             echo 'Build, test, and deployment successful!'
         }
         failure {
             echo 'Build, test, or deployment failed!'
-            }
         }
     }
 }
