@@ -13,7 +13,15 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                // Update npm to a specific compatible version
+                // Ensure correct Node.js version is used
+                script {
+                    def nodeVersion = sh(script: "node -v", returnStdout: true).trim()
+                    echo "Current Node.js version: ${nodeVersion}"
+                    if (!nodeVersion.contains('v20.0.0')) {
+                        error "Incorrect Node.js version: ${nodeVersion}. Expected: v20.0.0"
+                    }
+                }
+                // Install compatible npm version
                 sh 'npm install -g npm@9.7.0'
             }
         }
@@ -28,10 +36,7 @@ pipeline {
         stage('Test with Snyk') {
             steps {
                 // Add steps for testing with Snyk here
-                // Example:
-                // script {
                 snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
-                // }
             }
         }
         
@@ -39,7 +44,7 @@ pipeline {
             steps {
                 // Clean npm cache, install dependencies, and start the application
                 sh 'npm cache clean -f'
-                sh '/usr/share/nodejs/npm/bin/npm install --force'
+                sh 'npm install --force'
                 sh 'nohup npm start > /dev/null 2>&1 &'
                 sleep(time: 5, unit: 'SECONDS')
             }
