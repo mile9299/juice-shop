@@ -16,20 +16,27 @@ pipeline {
                 script {
                     // Update npm
                     sh 'npm install -g npm'
+                    sh 'nvm install 20.0.0' // Update Node.js version
+                    sh 'nvm use 20.0.0'
+                    sh 'npm install -g npm@latest'
                 }
             }
         }
         
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
+                script {
+                    checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
+                }
             }
         }
         
         stage('Test with Snyk') {
             steps {
-                // Add your Snyk test script here
-                // Example: script { snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK' }
+                script {
+                    // Replace with actual Snyk integration steps
+                    // Example: snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
+                }
             }
         }
         
