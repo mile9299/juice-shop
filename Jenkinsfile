@@ -7,7 +7,7 @@ pipeline {
     }
     
     tools {
-        nodejs 'NodeJS 18.0.0' // Change to a different version of Node.js
+        nodejs 'NodeJS 20.0.0' // Change to a different version of Node.js
         snyk 'snyk-manual' // Ensure 'snyk_latest' matches the name of the Snyk tool configured in Jenkins
     }
 
