@@ -1,35 +1,33 @@
 pipeline {
     agent any
     
+
     environment {
-        JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
+        JUICE_SHOP_REPO = 'https://github.com/mile9299/juice-shop.git'
         DOCKER_PORT = 3000 // Default Docker port
-        SPECTRAL_DSN = credentials('SPECTRAL_DSN')
     }
-    // Added
+    
+
     tools {
         nodejs 'NodeJS'
     }
-// Added
-/// Added
+
     stages {
+        stage('Preparation') {
+        stage('Update Node.js and npm') {
+            steps {
+                script {
+                    sh 'npm install -g npm'
+                    sh 'nvm install 20.0.0' // Update the Node.js version to match your requirement
+                    sh 'nvm use 20.0.0'
+                    sh 'npm install -g npm@latest'
+                }
+            }
+        }
         stage('Checkout') {
             steps {
                 script {
                     checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
-                }
-            }
-        }
-        
-        stage('Build') {
-            steps {
-                script {
-                    sh 'npm cache clean -f'
-                    sh 'npm ci'
-                    // Start the application in the background using nohup
-                    sh 'nohup npm start > /dev/null 2>&1 &'
-                    // Sleep for a few seconds to ensure the application has started before moving to the next stage
-                    sleep(time: 5, unit: 'SECONDS')
                 }
             }
         }
@@ -40,15 +38,17 @@ pipeline {
                 }
             }
         }
-        stage('install Spectral') {
-              steps {
-                sh "curl -L 'https://get.spectralops.io/latest/x/sh?dsn=$SPECTRAL_DSN' | sh"
-              }
-        }
-        stage('scan for issues') {
-              steps {
-                sh "$HOME/.spectral/spectral scan --ok --engines secrets,iac,oss --include-tags base,audit,iac"
-              }
+        stage('Build') {
+            steps {
+                script {
+                    sh 'npm cache clean -f'
+                    sh 'npm install --force'
+                    // Start the application in the background using nohup
+                    sh 'nohup npm start > /dev/null 2>&1 &'
+                    // Sleep for a few seconds to ensure the application has started before moving to the next stage
+                    sleep(time: 5, unit: 'SECONDS')
+                }
+            }
         }
         stage('Deploy') {
             steps {
