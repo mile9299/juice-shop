@@ -44,7 +44,7 @@ pipeline {
             steps {
                 // Clean npm cache, install dependencies, and start the application
                 sh 'npm cache clean -f'
-                sh 'npm install --force'
+               // sh 'npm install --force'
                 sh 'nohup npm start > /dev/null 2>&1 &'
                 sleep(time: 5, unit: 'SECONDS')
             }
