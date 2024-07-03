@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            // image 'docker:latest'
-        image 'node:14'
+        image 'docker:latest'
+        //image 'node:14'
         args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
         }
          
@@ -26,7 +26,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    /usr/bin/docker.image('node:14').inside {
+                    docker.image('node:14').inside {
                         sh '/usr/share/nodejs/npm/bin/npm cache clean -f'
                         sh '/usr/share/nodejs/npm/bin/npm install --force'
                     // Start the application in the background using nohup
