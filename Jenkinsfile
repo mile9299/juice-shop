@@ -13,8 +13,8 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                // Update npm and Node.js version
-                sh 'npm install -g npm@latest'
+                // Update npm to a specific compatible version
+                sh 'npm install -g npm@9.7.0'
             }
         }
         
@@ -30,7 +30,7 @@ pipeline {
                 // Add steps for testing with Snyk here
                 // Example:
                 // script {
-                 snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
+                snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
                 // }
             }
         }
