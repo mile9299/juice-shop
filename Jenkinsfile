@@ -6,9 +6,9 @@ pipeline {
         DOCKER_PORT = 3000 // Default Docker port
     }
     
-    tools {https://github.com/mile9299/juice-shop/blob/master/Jenkinsfile
-        nodejs 'NodeJS 20.0.0' // Ensure 'NodeJS 20.0.0' matches the name of the Node.js tool configured in Jenkins
-        //snyk 'snyk_latest' // Ensure 'snyk_latest' matches the name of the Snyk tool configured in Jenkins
+    tools {
+        nodejs 'NodeJS 18.0.0' // Change to a different version of Node.js
+        snyk 'snyk-manual' // Ensure 'snyk_latest' matches the name of the Snyk tool configured in Jenkins
     }
 
     stages {
@@ -17,8 +17,8 @@ pipeline {
                 script {
                     def nodeVersion = sh(script: "node -v", returnStdout: true).trim()
                     echo "Current Node.js version: ${nodeVersion}"
-                    if (!nodeVersion.contains('v20.0.0')) {
-                        error "Incorrect Node.js version: ${nodeVersion}. Expected: v20.0.0"
+                    if (!nodeVersion.contains('v18.0.0')) {
+                        error "Incorrect Node.js version: ${nodeVersion}. Expected: v18.0.0"
                     }
                 }
             }
