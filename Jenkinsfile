@@ -26,7 +26,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    docker.image('node:14').inside {
+                    /usr/bin/docker.image('node:14').inside {
                         sh '/usr/share/nodejs/npm/bin/npm cache clean -f'
                         sh '/usr/share/nodejs/npm/bin/npm install --force'
                     // Start the application in the background using nohup
