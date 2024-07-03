@@ -7,7 +7,7 @@ pipeline {
     }
     
     tools {
-        nodejs 'NodeJS_18.0.0' // Ensure 'NodeJS_18.0.0' matches the name of the Node.js tool configured in Jenkins
+        nodejs 'NodeJS 18.0.0' // Ensure 'NodeJS_18.0.0' matches the name of the Node.js tool configured in Jenkins
         snyk 'snyk-manual' // Ensure 'snyk_latest' matches the name of the Snyk tool configured in Jenkins
     }
 
