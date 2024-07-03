@@ -71,6 +71,7 @@ pipeline {
         }
         failure {
             echo 'Build, test, or deployment failed!'
+            }
         }
     }
 }
