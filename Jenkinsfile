@@ -8,12 +8,12 @@ pipeline {
     
     tools {
         nodejs 'NodeJS 20.0.0' // Ensure 'NodeJS 20.0.0' matches the name of the Node.js tool configured in Jenkins
+        snyk 'snyk_latest' // Ensure 'snyk_latest' matches the name of the Snyk tool configured in Jenkins
     }
 
     stages {
         stage('Preparation') {
             steps {
-                // Ensure correct Node.js version is used
                 script {
                     def nodeVersion = sh(script: "node -v", returnStdout: true).trim()
                     echo "Current Node.js version: ${nodeVersion}"
@@ -21,44 +21,56 @@ pipeline {
                         error "Incorrect Node.js version: ${nodeVersion}. Expected: v20.0.0"
                     }
                 }
-                // Install compatible npm version
-               // sh 'npm install -g npm@9.7.0'
             }
         }
         
         stage('Checkout') {
             steps {
-                // Checkout the repository
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
             }
         }
         
         stage('Test with Snyk') {
             steps {
-                // Add steps for testing with Snyk here
-                snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
+                snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk_latest', snykTokenId: 'SNYK'
             }
         }
-        
-        stage('Build') {
+
+        stage('Install Dependencies') {
             steps {
-                // Clean npm cache, install dependencies, and start the application
-               // sh 'npm cache clean -f'
-               // sh 'npm install --force'
-                sh 'nohup npm start > /dev/null 2>&1 &'
-                sleep(time: 5, unit: 'SECONDS')
+                sh 'npm install --legacy-peer-deps'
             }
         }
-        
+
+        stage('Build Frontend') {
+            steps {
+                sh 'cd frontend && npm install --legacy-peer-deps && npm run build:frontend'
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                sh 'npm run build:server'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                docker stop juice-shop || true
+                docker rm juice-shop || true
+                docker build -t juice-shop .
+                '''
+            }
+        }
+
         stage('Deploy') {
             steps {
-                // Stop and remove the container if it exists, build and run the Docker container
-                sh 'docker stop juice-shop || true'
-                sh 'docker rm juice-shop || true'
-                sh 'docker build -t juice-shop .'
-                sh "DOCKER_PORT=\$(docker run -d -P --name juice-shop juice-shop)"
-                sh "DOCKER_HOST_PORT=\$(docker port $DOCKER_PORT 3000 | cut -d ':' -f 2)"
-                echo "Juice Shop is running on http://localhost:\$DOCKER_HOST_PORT"
+                script {
+                    def containerId = sh(script: "docker run -d -P --name juice-shop juice-shop", returnStdout: true).trim()
+                    def dockerHostPort = sh(script: "docker port ${containerId} ${DOCKER_PORT} | cut -d ':' -f 2", returnStdout: true).trim()
+                    echo "Juice Shop is running on http://localhost:${dockerHostPort}"
+                }
             }
         }
     }
