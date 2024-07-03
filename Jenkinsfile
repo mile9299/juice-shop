@@ -32,7 +32,7 @@ pipeline {
         
         stage('Test with Snyk') {
             steps {
-                snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk_latest', snykTokenId: 'SNYK'
+                snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
             }
         }
 
