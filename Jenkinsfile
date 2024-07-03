@@ -7,7 +7,7 @@ pipeline {
     }
     
     tools {
-        nodejs 'NodeJS 20.0.0' // Change to a different version of Node.js
+        nodejs 'NodeJS 18.0.0' // Change to a different version of Node.js
         snyk 'snyk-manual' // Ensure 'snyk_latest' matches the name of the Snyk tool configured in Jenkins
     }
 
@@ -17,8 +17,8 @@ pipeline {
                 script {
                     def nodeVersion = sh(script: "node -v", returnStdout: true).trim()
                     echo "Current Node.js version: ${nodeVersion}"
-                    if (!nodeVersion.contains('20.0.0')) {
-                        error "Incorrect Node.js version: ${nodeVersion}. Expected: v18.0.0"
+                    if (!nodeVersion.contains('18.0.0')) {
+                        error "Incorrect Node.js version: ${nodeVersion}. Expected: v118.0.0"
                     }
                 }
             }
