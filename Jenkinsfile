@@ -26,6 +26,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    sh 'docker install --force'
                     docker.image('node:14').inside {
                         sh '/usr/share/nodejs/npm/bin/npm cache clean -f'
                         sh '/usr/share/nodejs/npm/bin/npm install --force'
