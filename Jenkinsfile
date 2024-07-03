@@ -13,59 +13,50 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                script {
-                    // Update npm
-                    sh 'npm install -g npm'
-                    sh 'nvm install 20.0.0' // Update Node.js version
-                    sh 'nvm use 20.0.0'
-                    sh 'npm install -g npm@latest'
-                }
+                // Update npm and Node.js version
+                sh 'npm install -g npm'
+                sh 'nvm install 20.0.0'
+                sh 'nvm use 20.0.0'
+                sh 'npm install -g npm@latest'
             }
         }
         
         stage('Checkout') {
             steps {
-                script {
-                    checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
-                }
+                // Checkout the repository
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
             }
         }
         
         stage('Test with Snyk') {
             steps {
-                script {
-                    // Replace with actual Snyk integration steps
-                    // Example: snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
-                }
+                // Add steps for testing with Snyk here
+                // Example:
+                // script {
+                //     snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
+                // }
             }
         }
         
         stage('Build') {
             steps {
-                script {
-                    // Clean npm cache and install dependencies
-                    sh 'npm cache clean -f'
-                    sh 'npm install --force'
-                    // Start the application in the background using nohup
-                    sh 'nohup npm start > /dev/null 2>&1 &'
-                    // Sleep for a few seconds to ensure the application has started before moving to the next stage
-                    sleep(time: 5, unit: 'SECONDS')
-                }
+                // Clean npm cache, install dependencies, and start the application
+                sh 'npm cache clean -f'
+                sh 'npm install --force'
+                sh 'nohup npm start > /dev/null 2>&1 &'
+                sleep(time: 5, unit: 'SECONDS')
             }
         }
         
         stage('Deploy') {
             steps {
-                script {
-                    // Stop and remove the container if it exists
-                    sh 'docker stop juice-shop || true'
-                    sh 'docker rm juice-shop || true'
-                    // Build and run the Docker container with a dynamically allocated port
-                    sh "docker build -t juice-shop ."
-                    sh "DOCKER_PORT=\$(docker run -d -P --name juice-shop juice-shop)"
-                    sh "DOCKER_HOST_PORT=\$(docker port $DOCKER_PORT 3000 | cut -d ':' -f 2)"
-                    echo "Juice Shop is running on http://localhost:\$DOCKER_HOST_PORT"
-                }
+                // Stop and remove the container if it exists, build and run the Docker container
+                sh 'docker stop juice-shop || true'
+                sh 'docker rm juice-shop || true'
+                sh 'docker build -t juice-shop .'
+                sh "DOCKER_PORT=\$(docker run -d -P --name juice-shop juice-shop)"
+                sh "DOCKER_HOST_PORT=\$(docker port $DOCKER_PORT 3000 | cut -d ':' -f 2)"
+                echo "Juice Shop is running on http://localhost:\$DOCKER_HOST_PORT"
             }
         }
     }
