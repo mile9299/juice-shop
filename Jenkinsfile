@@ -7,16 +7,13 @@ pipeline {
     }
     
     tools {
-        nodejs 'NodeJS' // Ensure 'NodeJS' matches the name of the Node.js tool configured in Jenkins
+        nodejs 'NodeJS 20.0.0' // Ensure 'NodeJS 20.0.0' matches the name of the Node.js tool configured in Jenkins
     }
 
     stages {
         stage('Preparation') {
             steps {
                 // Update npm and Node.js version
-                sh 'npm install -g npm'
-                sh 'nvm install 20.0.0'
-                sh 'nvm use 20.0.0'
                 sh 'npm install -g npm@latest'
             }
         }
@@ -33,7 +30,7 @@ pipeline {
                 // Add steps for testing with Snyk here
                 // Example:
                 // script {
-                snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
+                // snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
                 // }
             }
         }
