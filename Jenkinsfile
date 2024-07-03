@@ -8,7 +8,7 @@ pipeline {
     
     tools {
         nodejs 'NodeJS 20.0.0' // Ensure 'NodeJS 20.0.0' matches the name of the Node.js tool configured in Jenkins
-        snyk 'snyk_latest' // Ensure 'snyk_latest' matches the name of the Snyk tool configured in Jenkins
+        //snyk 'snyk_latest' // Ensure 'snyk_latest' matches the name of the Snyk tool configured in Jenkins
     }
 
     stages {
