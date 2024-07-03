@@ -33,7 +33,7 @@ pipeline {
                 // Add steps for testing with Snyk here
                 // Example:
                 // script {
-                //     snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
+                snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
                 // }
             }
         }
