@@ -18,13 +18,7 @@ pipeline {
                 }
             }
         }
-        stage('Test with Snyk') {
-            steps {
-                script {
-                    snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
-                }
-            }
-        }
+        
         stage('Build') {
             steps {
                 script {
@@ -36,6 +30,13 @@ pipeline {
 
                     // Sleep for a few seconds to ensure the application has started before moving to the next stage
                     sleep(time: 5, unit: 'SECONDS')
+                }
+            }
+        }
+        stage('Test with Snyk') {
+            steps {
+                script {
+                    snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
                 }
             }
         }
