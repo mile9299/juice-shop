@@ -6,7 +6,7 @@ pipeline {
         DOCKER_PORT = 3000 // Default Docker port
     }
     
-    tools {
+    tools {https://github.com/mile9299/juice-shop/blob/master/Jenkinsfile
         nodejs 'NodeJS 20.0.0' // Ensure 'NodeJS 20.0.0' matches the name of the Node.js tool configured in Jenkins
         //snyk 'snyk_latest' // Ensure 'snyk_latest' matches the name of the Snyk tool configured in Jenkins
     }
