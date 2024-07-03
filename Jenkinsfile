@@ -22,7 +22,7 @@ pipeline {
                     }
                 }
                 // Install compatible npm version
-                sh 'npm install -g npm@9.7.0'
+               // sh 'npm install -g npm@9.7.0'
             }
         }
         
