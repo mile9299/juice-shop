@@ -19,20 +19,6 @@ pipeline {
                 }
             }
         }
-        
-        stage('Build') {
-            steps {
-                script {
-                    sh 'npm cache clean -f'
-                    sh 'npm install --force'
-                    // Start the application in the background using nohup
-                    sh 'nohup npm start > /dev/null 2>&1 &'
-
-                    // Sleep for a few seconds to ensure the application has started before moving to the next stage
-                    sleep(time: 5, unit: 'SECONDS')
-                }
-            }
-        }
         stage('Test with Snyk') {
             steps {
                 script {
@@ -49,6 +35,19 @@ pipeline {
               steps {
                 sh "$HOME/.spectral/spectral scan --ok --engines secrets,iac,oss --include-tags base,audit,iac"
               }
+        }
+        stage('Build') {
+            steps {
+                script {
+                    sh 'npm cache clean -f'
+                    sh 'npm install --force'
+                    // Start the application in the background using nohup
+                    sh 'nohup npm start > /dev/null 2>&1 &'
+
+                    // Sleep for a few seconds to ensure the application has started before moving to the next stage
+                    sleep(time: 5, unit: 'SECONDS')
+                }
+            }
         }
         stage('Deploy') {
             steps {
