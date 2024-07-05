@@ -8,7 +8,7 @@ pipeline {
     }
     // Added
     tools {
-        nodejs 'NodeJS'
+        nodejs 'NodeJS 18.0.0'
     }
 /// Added
     stages {
