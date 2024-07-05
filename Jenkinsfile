@@ -2,79 +2,72 @@ pipeline {
     agent any
     
     environment {
-        JUICE_SHOP_REPO = 'https://github.com/mile9299/juice-shop.git'
+        JUICE_SHOP_REPO = 'https://github.com/bkimminich/juice-shop.git'
         DOCKER_PORT = 3000 // Default Docker port
+        SPECTRAL_DSN = credentials('SPECTRAL_DSN')
     }
-    
+    // Added
     tools {
-        nodejs 'NodeJS 18.0.0' // Ensure 'NodeJS_18.0.0' matches the name of the Node.js tool configured in Jenkins
-        snyk 'snyk-manual' // Ensure 'snyk_latest' matches the name of the Snyk tool configured in Jenkins
+        nodejs 'NodeJS'
     }
-
+/// Added
     stages {
-        stage('Preparation') {
+        stage('Checkout') {
             steps {
                 script {
-                    def nodeVersion = sh(script: "node -v", returnStdout: true).trim()
-                    echo "Current Node.js version: ${nodeVersion}"
-                    if (!nodeVersion.contains('v18.')) {
-                        error "Incorrect Node.js version: ${nodeVersion}. Expected: v18.x.x"
-                    }
+                    checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
                 }
             }
         }
         
-        stage('Checkout') {
+        stage('Build') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: JUICE_SHOP_REPO]]])
+                script {
+                    sh 'npm cache clean -f'
+                    sh 'npm install --force'
+                    // Start the application in the background using nohup
+                    sh 'nohup npm start > /dev/null 2>&1 &'
+
+                    // Sleep for a few seconds to ensure the application has started before moving to the next stage
+                    sleep(time: 5, unit: 'SECONDS')
+                }
             }
         }
-        
         stage('Test with Snyk') {
             steps {
-                snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
+                script {
+                    snykSecurity failOnIssues: false, severity: 'critical', snykInstallation: 'snyk-manual', snykTokenId: 'SNYK'
+                }
             }
         }
-
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install --legacy-peer-deps'
-            }
+        stage('install Spectral') {
+              steps {
+                sh "curl -L 'https://get.spectralops.io/latest/x/sh?dsn=$SPECTRAL_DSN' | sh"
+              }
         }
-
-        stage('Build Frontend') {
-            steps {
-                sh 'cd frontend && npm install --legacy-peer-deps && npm run build:frontend'
-            }
+        stage('scan for issues') {
+              steps {
+                sh "$HOME/.spectral/spectral scan --ok --engines secrets,iac,oss --include-tags base,audit,iac"
+              }
         }
-
-        stage('Build Backend') {
-            steps {
-                sh 'npm run build:server'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh '''
-                docker stop juice-shop || true
-                docker rm juice-shop || true
-                docker build -t juice-shop .
-                '''
-            }
-        }
-
         stage('Deploy') {
             steps {
                 script {
-                    def containerId = sh(script: "docker run -d -P --name juice-shop juice-shop", returnStdout: true).trim()
-                    def dockerHostPort = sh(script: "docker port ${containerId} ${DOCKER_PORT} | cut -d ':' -f 2", returnStdout: true).trim()
-                    echo "Juice Shop is running on http://localhost:${dockerHostPort}"
+                    // Stop and remove the container if it exists
+                    sh 'docker stop juice-shop || true'
+                    sh 'docker rm juice-shop || true'
+
+                    // Build and run the Docker container with a dynamically allocated port
+                    sh "docker build -t juice-shop ."
+                    sh "DOCKER_PORT=\$(docker run -d -P --name juice-shop juice-shop)"
+                    sh "DOCKER_HOST_PORT=\$(docker port $DOCKER_PORT 3000 | cut -d ':' -f 2)"
+
+                    echo "Juice Shop is running on http://localhost:\$DOCKER_HOST_PORT"
                 }
             }
         }
     }
-    
+
     post {
         success {
             echo 'Build, test, and deployment successful!'
